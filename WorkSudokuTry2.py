@@ -11,12 +11,14 @@ class Assignment:
 	col = 0 #col of first letter
 	word = ""
 	sitchType = sitch.accross
+	shiftBack = 0
 
-	def __init__(self, row=0, col=0, word="", sitchType=sitch.accross):
+	def __init__(self, row=0, col=0, word="", sitchType=sitch.accross,shiftBack=0):
 		self.row = row
 		self.col = col
 		self.word = word
 		self.sitchType = sitchType
+		self.shiftBack = shiftBack
 
 initGrid = [] #(row,col) order
 Domain = [] #(word,sitch)
@@ -53,23 +55,17 @@ def buildGridFromAssignment():
 		word = a.word
 		if a.sitchType==sitch.accross:
 			wordPos = 0
-			if a.col+len(word)>9:
-				return False
-			for i in range(a.col,a.col+len(word)):
-				if currGrid[a.row][i]!='_' and currGrid[a.row][i]!=word[wordPos]:
-					return False
+			col = a.col
+			for i in range(col,col+len(word)):
 				currGrid[a.row][i]=word[wordPos]
 				wordPos+=1
 		elif a.sitchType==sitch.down:
 			wordPos = 0
-			if a.row+len(word)>9:
-				return False
-			for i in range(a.row,a.row+len(word)):
-				if currGrid[i][a.col]!='_' and currGrid[i][a.col]!=word[wordPos]:
-					return False
+			row = a.row
+			for i in range(row,row+len(word)):
 				currGrid[i][a.col]=word[wordPos]
 				wordPos+=1
-	# print currGrid
+	print currGrid
 	return currGrid
 
 def check3x3(currGrid):
@@ -110,11 +106,8 @@ def checkCols(currGrid):
 def isConsistent():
 	currGrid = buildGridFromAssignment()
 	if currGrid == False:
-		return "Don't Assign"
-	if (check3x3(currGrid) and checkRows(currGrid) and checkCols(currGrid)):
-		return "Assign"
-	else:
-		return "False"
+		return False
+	return (check3x3(currGrid) and checkRows(currGrid) and checkCols(currGrid))
 
 def printSolution():
 	solutionGrid = buildGridFromAssignment()
@@ -123,80 +116,67 @@ def printSolution():
 			print solutionGrid[row][col],
 		print ''
 
+#returns the next blank space
 def chooseNextVariable(prev_row,prev_col):
-	# if prev_row==8 and prev_col==8:
-	# 	print "uh oh!"
-	# 	return False
-	# if prev_col < 8:
-	# 	if prev_col % 3 < 2:
-	# 		return (prev_row,prev_col+1)
-	# 	if prev_col % 3 == 2 and prev_row % 3 < 2:
-	# 		return (prev_row+1,prev_col-2)
-	# 	if prev_col % 3 ==2 and prev_row % 3 == 2:
-	# 		return (prev_row-2,prev_col+2)
-	# return (prev_row+1,0)
-
-	if prev_col < 8:
-		return (prev_row, prev_col+1)
-	return (prev_row+1,0)
+	currGrid = buildGridFromAssignment()
+	for i in range(9):
+		for j in range(9):
+			if currGrid[i][j]=='_':
+				print (i,j)
+				return (i,j)
+	return True
 
 
 def BackTrace(row,col):
-	possible = False
-	if len(assignments)==18:
+	currGrid = buildGridFromAssignment()
+	if len(assignments)>17:
 		return True
 	for word in reversed(Domain):
-		valAssignment = Assignment(row,col,word,sitch.accross)
-		assignments.append(valAssignment)
-		if isConsistent()=="Don't Assign":
-			possible=True
-		if isConsistent()=="Assign":
-			Domain.remove(word)
-			varCoord = chooseNextVariable(row,col)
-			# if varCoord == False:
-			# 	return False
-			result = BackTrace(varCoord[0],varCoord[1])
-			trow = row
-			tcol = col
-			while(result=="Possible"):
-				varCoord = chooseNextVariable(trow,tcol)
-				trow = varCoord[0]
-				tcol = varCoord[1]
-				result = BackTrace(varCoord[0],varCoord[1])
-			if result:
-				return True
-			if result == False:
-				assignments.remove(valAssignment)
-				Domain.append(word)
-		else:
-			assignments.remove(valAssignment)
-			valAssignment = Assignment(row,col,word,sitch.down) #try the down version of the word
-			assignments.append(valAssignment)
-			if isConsistent()=="Don't Assign":
-				possible=True
-			if isConsistent()=="Assign":
+		shifts = []
+		for shift in range(len(word)):
+			tempCol = col - shift
+			if tempCol >= 0 and tempCol + len(word) <= 9:
+				shouldAdd = True
+				wordPos = 0
+				for c in range(tempCol,tempCol+len(word)):
+					if currGrid[row][c]!='_' and currGrid[row][c]!=word[wordPos]:
+						shouldAdd = False
+						break
+					wordPos+=1
+				if shouldAdd:
+					valAssignment = Assignment(row,tempCol,word,sitch.accross)
+					shifts.append(valAssignment)
+
+
+			tempRow = row - shift
+			if tempRow >= 0 and tempRow + len(word) <= 9:
+				shouldAdd = True
+				wordPos = 0
+				for r in range(tempRow,tempRow+len(word)):
+					if currGrid[r][col]!='_' and currGrid[r][col]!=word[wordPos]:
+						shouldAdd = False
+						break
+					wordPos+=1
+				if shouldAdd:
+					valAssignment = Assignment(tempRow,col,word,sitch.down)
+					shifts.append(valAssignment)
+		for assignment in shifts:
+			assignments.append(assignment)
+			if isConsistent():
 				Domain.remove(word)
+				print row, col
 				varCoord = chooseNextVariable(row,col)
-				# if varCoord == False:
-				# 	return False
+				print varCoord
+				if varCoord == True:
+					return True
 				result = BackTrace(varCoord[0],varCoord[1])
-				trow = row
-				tcol = col
-				while(result=="Possible"):
-					varCoord = chooseNextVariable(trow,tcol)
-					trow = varCoord[0]
-					tcol = varCoord[1]
-					result = BackTrace(varCoord[0],varCoord[1])
 				if result:
 					return True
 				if result == False:
-					assignments.remove(valAssignment)
+					assignments.remove(assignment)
 					Domain.append(word)
 			else:
-				assignments.remove(valAssignment)
-	currGrid = buildGridFromAssignment()
-	if currGrid[row][col]!='_' and possible:
-		return "Possible"
+				assignments.remove(assignment)
 	return False
 
 
