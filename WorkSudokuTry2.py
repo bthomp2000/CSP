@@ -3,17 +3,17 @@ import time
 import copy
 
 class sitch(Enum):
-	accross = 1
+	across = 1
 	down = 2
 
 class Assignment:
 	row = 0 #row of first letter
 	col = 0 #col of first letter
 	word = ""
-	sitchType = sitch.accross
-	shiftBack = 0
+	sitchType = sitch.across
 
-	def __init__(self, row=0, col=0, word="", sitchType=sitch.accross,shiftBack=0):
+
+	def __init__(self, row=0, col=0, word="", sitchType=sitch.across,shiftBack=0):
 		self.row = row
 		self.col = col
 		self.word = word
@@ -25,6 +25,7 @@ Domain = [] #(word,sitch)
 assignments = [] #Array<Assignment>
 Domains = []
 
+values = {} #(x,y): value (0-24, 0 being the most constraining)
 
 
 def readInput(inputNum):
@@ -39,21 +40,50 @@ def readInput(inputNum):
 				row.append(character)
 			initGrid.append(row)
 
-def buildBlankGrid():
-	currGrid = []
+def initValues():
 	for i in range(9):
-		gridrow = []
 		for j in range(9):
-			gridrow.append('_')
-		currGrid.append(gridrow)
-	return currGrid
+			values[(i,j)]=0
+
+def updateValuesFromGrid():
+	currGrid=buildGridFromAssignment()
+	initValues()
+	rowvals=[]
+	colvals=[]
+	squarevals=[]
+
+	#update row values
+	for i in range(9):
+		rowcount = 0
+		for j in range(9):
+			if currGrid[i][j]!='_':
+				rowcount+=1
+			rowvals.append(rowcount)
+	#update col values
+	for c in range(9):
+		rowcount = 0
+		for r in range(9):
+			if currGrid[r][c]!='_':
+				colcount+=1
+			colvals.append(colcount)
+
+	#update square values
+	for row in range(0,9,3):
+		for col in range(0,9,3):
+			squarecount = 0
+			for r in range(row,row+3):
+				for c in range(col,col+3):	
+					if currGrid[r][c]!='_':
+						squarecount+=1
+			squarevals.append(squarecount)
+
+	#TODO: now update values for each coordinate using rowvals, colvals and squarevals
 
 def buildGridFromAssignment():
 	currGrid = copy.deepcopy(initGrid)
-	# currGrid = buildBlankGrid()
 	for a in assignments:
 		word = a.word
-		if a.sitchType==sitch.accross:
+		if a.sitchType==sitch.across:
 			wordPos = 0
 			col = a.col
 			for i in range(col,col+len(word)):
@@ -65,7 +95,7 @@ def buildGridFromAssignment():
 			for i in range(row,row+len(word)):
 				currGrid[i][a.col]=word[wordPos]
 				wordPos+=1
-	print currGrid
+	# print currGrid
 	return currGrid
 
 def check3x3(currGrid):
@@ -79,6 +109,7 @@ def check3x3(currGrid):
 						return False
 					if l != '_':
 						letters[l]=True
+
 	return True
 
 def checkRows(currGrid):
@@ -118,6 +149,10 @@ def printSolution():
 
 #returns the next blank space
 def chooseNextVariable(prev_row,prev_col):
+	# updateValuesFromGrid()
+	# maxx = 0
+	# #TODO: find the blank coordinate with the maximum value from values and return that coordinate because this means it is the least constraining
+
 	currGrid = buildGridFromAssignment()
 	for i in range(9):
 		for j in range(9):
@@ -129,7 +164,7 @@ def chooseNextVariable(prev_row,prev_col):
 
 def BackTrace(row,col):
 	currGrid = buildGridFromAssignment()
-	if len(assignments)>17:
+	if len(assignments)>18:
 		return True
 	for word in reversed(Domain):
 		shifts = []
@@ -144,7 +179,7 @@ def BackTrace(row,col):
 						break
 					wordPos+=1
 				if shouldAdd:
-					valAssignment = Assignment(row,tempCol,word,sitch.accross)
+					valAssignment = Assignment(row,tempCol,word,sitch.across)
 					shifts.append(valAssignment)
 
 
@@ -187,5 +222,6 @@ Domain.sort(lambda x,y: cmp(len(x),len(y)))
 print Domain
 start_time = time.time()
 print BackTrace(0,0)
+print values
 printSolution()
 print("Time: %s seconds" % (time.time() - start_time))
