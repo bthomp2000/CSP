@@ -22,7 +22,7 @@ class Square:
 
 
 class Board:
-    grid = [] #A grid of Squares with arrangement [row][col]
+    grid = [] #A grid of Squares with arrangement [row][col]. Bottom-left is [0][0]
     dimension = 0 #The dimension of the game board. For example, 8 means an 8x8 board
 
     def __init__(self, dimension=8):
@@ -39,6 +39,13 @@ class Board:
 
     def setPiece(self, row, col, piece):
         self.grid[row][col].piece = piece
+
+    def getPiece(self, row, col):
+        return self.grid[row][col].piece
+
+    def isPointOnBoard(self, row, col):
+        isOffBoard = row < 0 or col < 0 or row >= self.dimension or col >= self.dimension
+        return not isOffBoard
 
 
 class Movement:
