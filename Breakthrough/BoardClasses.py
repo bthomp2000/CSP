@@ -23,8 +23,11 @@ class Square:
 
 class Board:
     grid = [] #A grid of Squares with arrangement [row][col]
+    dimension = 0 #The dimension of the game board. For example, 8 means an 8x8 board
 
     def __init__(self, dimension=8):
+        assert dimension >= 4
+        self.dimension = dimension
         self.initializeGrid(dimension)
 
     def initializeGrid(self, dimension):
