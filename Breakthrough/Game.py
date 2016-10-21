@@ -45,3 +45,4 @@ class Game:
         if defendingPiece is not None:
             if defendingPiece.color is playerColor:
                 return False
+        #TODO: Add logic for attacking enemies
