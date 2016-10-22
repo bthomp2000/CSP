@@ -45,4 +45,49 @@ class Game:
         if defendingPiece is not None:
             if defendingPiece.color is playerColor:
                 return False
-        #TODO: Add logic for attacking enemies
+            if origin[1] == destination[1]:
+                return False
+
+    def isGameOver(self):
+        #Has either side has reached the opposing side's last row
+        for col in range(0, self.board.dimension):
+            checkPieceTop = self.board.getPiece(0, col)
+            if checkPieceTop is not None and checkPieceTop.color == Color.white:
+                return True
+            checkPieceBottom = self.board.getPiece(self.board.dimension - 1, col)
+            if checkPieceBottom is not None and checkPieceBottom.color == Color.black:
+                return True
+        #Check that each side has pieces left on the board
+        blackPiecesLeft = False
+        whitePiecesLeft = False
+        for row in range(0, self.board.dimension):
+            for col in range(0, self.board.dimension):
+                checkPiece = self.board.getPiece(row, col)
+                if checkPiece is not None:
+                    if checkPiece.color == Color.white:
+                        whitePiecesLeft = True
+                    else:
+                        blackPiecesLeft = True
+        if not blackPiecesLeft or not whitePiecesLeft:
+            return True
+
+    def makeMovement(self, playerMoving, movement):
+        if self.isValidMove(playerMoving, movement):
+            defendingPiece = self.board.getPiece(movement.destination[0], movement.destination[1])
+            if defendingPiece is not None:
+                playerMoving.opponentWorkersCaptured += 1
+            movingPiece = self.board.getPiece(movement.origin[0], movement.origin[1])
+            self.board.setPiece(movement.destination[0], movement.destination[1], movingPiece)
+            self.board.setPiece(movement.origin[0], movement.origin[1], None)
+        else:
+            print("Not valid move")
+
+    def mainLoop(self):
+        activePlayer = self.player1
+        while not self.isGameOver():
+            movement = activePlayer.makeMove(self.board)
+            self.makeMovement(activePlayer, movement)
+            if activePlayer == self.player1:
+                activePlayer = self.player2
+            else:
+                activePlayer = self.player1
