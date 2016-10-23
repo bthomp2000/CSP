@@ -83,6 +83,7 @@ class MinimaxPlayer(Player):
                 elif not isThisPlayerMoving and vPrime < v:
                     v = vPrime
                 board.undoMovement(currentPlayer, rightForward, oldDestinationPiece)
+        return v
 
     def offensiveEvaluate(self, board, otherPlayer):
         total = 0
