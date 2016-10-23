@@ -1,5 +1,5 @@
 import abc
-from Breakthrough.BoardClasses import *
+from BoardClasses import *
 
 class Player(object):
     __metaclass__ = abc.ABCMeta
@@ -33,15 +33,17 @@ class Player(object):
 class MinimaxPlayer(Player):
     isOffensive = True
 
-    def __init__(self, isOffensive):
+    def __init__(self, isOffensive,color):
         self.isOffensive = isOffensive
+        self.color = color
 
     def makeMove(self, board, otherPlayer):
         bestMove = self.minimax(board, 3, True, otherPlayer)[1]
         board.makeMovement(self, bestMove)
 
     def minimax(self, board, depth, isThisPlayerMoving, otherPlayer):
-        if board.isGameOver() is True or depth == 0:
+        if board.isGameOver() or depth == 0:
+            # print depth
             if self.isOffensive:
                 return (self.offensiveEvaluate(board, otherPlayer), None)
             else:
@@ -67,6 +69,7 @@ class MinimaxPlayer(Player):
             if board.isValidMove(currentPlayer, leftForward):
                 oldDestinationPiece = board.makeMovement(currentPlayer, leftForward)
                 vPrime = self.minimax(board, depth-1, not isThisPlayerMoving, otherPlayer)[0]
+                # print vPrime
                 if isThisPlayerMoving and vPrime > v:
                     v = vPrime
                     bestMove = leftForward
@@ -106,6 +109,7 @@ class MinimaxPlayer(Player):
                 total += 1 * pieceLocation[0]
             else:
                 total += 1 * (board.dimension - (pieceLocation[0]+1))
+        return total
 
     def defensiveEvaluate(self, board, otherPlayer):
         playerPieces = board.findPlayerPieces()
@@ -117,6 +121,6 @@ class MinimaxPlayer(Player):
                 total -= 1 * pieceLocation[0]
             else:
                 total -= 1 * (board.dimension - (pieceLocation[0]+1))
-
+        return total
 
 #class AlphaBetaPlayer(Player):

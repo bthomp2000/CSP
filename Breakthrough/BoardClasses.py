@@ -48,13 +48,25 @@ class Board:
         isOffBoard = row < 0 or col < 0 or row >= self.dimension or col >= self.dimension
         return not isOffBoard
 
+    def printBoard(self):
+        for row in range(0, self.dimension):
+            for col in range(0, self.dimension):
+                if self.getPiece(row,col) == None:
+                    print ' ',
+                elif self.getPiece(row,col).color == Color.white:
+                    print 'W',
+                else:
+                    print 'B',
+            print ''
+        print ''
+
     def isGameOver(self):
         #Has either side has reached the opposing side's last row
         for col in range(0, self.dimension):
-            checkPieceTop = self.getPiece(0, col)
+            checkPieceTop = self.getPiece(self.dimension - 1, col)
             if checkPieceTop is not None and checkPieceTop.color == Color.white:
                 return True
-            checkPieceBottom = self.getPiece(self.dimension - 1, col)
+            checkPieceBottom = self.getPiece(0, col)
             if checkPieceBottom is not None and checkPieceBottom.color == Color.black:
                 return True
         #Check that each side has pieces left on the board
@@ -72,11 +84,12 @@ class Board:
             return True
 
     def makeMovement(self, playerMoving, movement):
-        defendingPiece = self.getPiece(movement.destination[0], movement.destination[1])
-        movingPiece = self.getPiece(movement.origin[0], movement.origin[1])
-        self.setPiece(movement.destination[0], movement.destination[1], movingPiece)
-        self.setPiece(movement.origin[0], movement.origin[1], None)
-        return defendingPiece
+        if self.isValidMove(playerMoving, movement):
+            defendingPiece = self.getPiece(movement.destination[0], movement.destination[1])
+            movingPiece = self.getPiece(movement.origin[0], movement.origin[1])
+            self.setPiece(movement.destination[0], movement.destination[1], movingPiece)
+            self.setPiece(movement.origin[0], movement.origin[1], None)
+            return defendingPiece
 
     def undoMovement(self, playerMoving, movement, destinationPiece):
         movingPiece = self.getPiece(movement.destination[0], movement.destination[1])
@@ -116,6 +129,7 @@ class Board:
                 return False
             if origin[1] == destination[1]:
                 return False
+        return True
 
 
 class Movement:
