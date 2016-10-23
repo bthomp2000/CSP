@@ -1,5 +1,5 @@
 from Breakthrough.BoardClasses import Board, Color, Movement, Piece
-from Breakthrough.AIClasses import Player
+from Breakthrough.AIClasses import Player, MinimaxPlayer
 
 class Game:
     player1 = None #White
@@ -88,10 +88,18 @@ class Game:
 
     def mainLoop(self):
         activePlayer = self.player1
+        inactivePlayer = self.player2
         while not self.isGameOver():
-            movement = activePlayer.makeMove(self.board)
+            movement = activePlayer.makeMove(self.board, inactivePlayer)
             self.makeMovement(activePlayer, movement)
             if activePlayer == self.player1:
                 activePlayer = self.player2
+                inactivePlayer = self.player1
             else:
                 activePlayer = self.player1
+                inactivePlayer = self.player2
+
+player1 = MinimaxPlayer(True)
+player2 = MinimaxPlayer(False)
+mainGame = Game(player1, player2, 8)
+mainGame.mainLoop()

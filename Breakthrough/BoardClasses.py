@@ -32,11 +32,11 @@ class Board:
         self.initializeGrid(dimension)
 
     def initializeGrid(self, dimension):
-        grid=[]
+        self.grid=[]
         for i in range(0,dimension):
-            grid.append([])
+            self.grid.append([])
             for j in range(0,dimension):
-                grid.append(Square(None))
+                self.grid[i].append(Square(None))
 
     def setPiece(self, row, col, piece):
         self.grid[row][col].piece = piece
@@ -92,6 +92,7 @@ class Board:
                 currPiece = self.getPiece(row, col)
                 if currPiece is not None:
                     playerPieces[currPiece.color].append((row, col))
+        return playerPieces
 
     def isValidMove(self, playerMoving, movement):
         playerColor = playerMoving.color

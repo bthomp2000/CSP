@@ -34,7 +34,6 @@ class MinimaxPlayer(Player):
     isOffensive = True
 
     def __init__(self, isOffensive):
-        super.__init__()
         self.isOffensive = isOffensive
 
     def makeMove(self, board, otherPlayer):
@@ -120,4 +119,4 @@ class MinimaxPlayer(Player):
                 total -= 1 * (board.dimension - (pieceLocation[0]+1))
 
 
-class AlphaBetaPlayer(Player):
+#class AlphaBetaPlayer(Player):
