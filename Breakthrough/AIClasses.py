@@ -97,7 +97,7 @@ class MinimaxPlayer(Player):
                     v = vPrime
                     bestMove = rightForward
                 board.undoMovement(currentPlayer, rightForward, oldDestinationPiece)
-        print "value: ",v
+        #print "value: ",v
         return (v, bestMove)
 
     def offensiveEvaluate(self, board, otherPlayer):
@@ -188,14 +188,16 @@ class AlphaBetaPlayer(Player):
                     if vPrime > v:
                         v = vPrime
                         bestMove = leftForward
-                    if v > maxVal: #we are a min node
+                    if v > maxVal:
+                        board.undoMovement(currentPlayer, leftForward, oldDestinationPiece)
                         return (maxVal,bestMove)
-                else:
+                else: #we are a min node
                     vPrime = self.minimax(board, depth-1, minVal,v,not isThisPlayerMoving, otherPlayer)[0]
                     if vPrime < v:
                         v = vPrime
                         bestMove = leftForward
                     if v < minVal:
+                        board.undoMovement(currentPlayer, leftForward, oldDestinationPiece)
                         return (minVal,bestMove)
                 board.undoMovement(currentPlayer, leftForward, oldDestinationPiece)
             if board.isValidMove(currentPlayer, forward):
@@ -207,6 +209,7 @@ class AlphaBetaPlayer(Player):
                         v = vPrime
                         bestMove = forward
                     if v > maxVal:
+                        board.undoMovement(currentPlayer, forward, oldDestinationPiece)
                         return (maxVal,bestMove)
                 else:
                     vPrime = self.minimax(board, depth-1, minVal,v,not isThisPlayerMoving, otherPlayer)[0]
@@ -214,6 +217,7 @@ class AlphaBetaPlayer(Player):
                         v = vPrime
                         bestMove = forward
                     if v < minVal:
+                        board.undoMovement(currentPlayer, forward, oldDestinationPiece)
                         return (minVal,bestMove)
                 board.undoMovement(currentPlayer, forward, oldDestinationPiece)
             if board.isValidMove(currentPlayer, rightForward):
@@ -225,6 +229,7 @@ class AlphaBetaPlayer(Player):
                         v = vPrime
                         bestMove = rightForward
                     if v > maxVal:
+                        board.undoMovement(currentPlayer, rightForward, oldDestinationPiece)
                         return (maxVal,bestMove)
                 else:
                     vPrime = self.minimax(board, depth-1, minVal,v,not isThisPlayerMoving, otherPlayer)[0]
@@ -232,6 +237,7 @@ class AlphaBetaPlayer(Player):
                         v = vPrime
                         bestMove = rightForward
                     if v < minVal:
+                        board.undoMovement(currentPlayer, rightForward, oldDestinationPiece)
                         return (minVal,bestMove)
                 board.undoMovement(currentPlayer, rightForward, oldDestinationPiece)
         return (v, bestMove)

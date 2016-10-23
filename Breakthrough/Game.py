@@ -66,7 +66,7 @@ class Game:
                 activePlayer = self.player1
                 inactivePlayer = self.player2
 
-player1 = AlphaBetaPlayer(True,Color.white)
-player2 = AlphaBetaPlayer(True,Color.black)
+player1 = MinimaxPlayer(True,Color.white)
+player2 = MinimaxPlayer(True,Color.black)
 mainGame = Game(player1, player2, 8)
 mainGame.mainLoop()
