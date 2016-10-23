@@ -1,5 +1,5 @@
 from BoardClasses import Board, Color, Movement, Piece
-from AIClasses import Player, MinimaxPlayer
+from AIClasses import Player, MinimaxPlayer, AlphaBetaPlayer
 
 class Game:
     player1 = None #White
@@ -66,7 +66,7 @@ class Game:
                 activePlayer = self.player1
                 inactivePlayer = self.player2
 
-player1 = MinimaxPlayer(True,Color.white)
-player2 = MinimaxPlayer(False,Color.black)
+player1 = AlphaBetaPlayer(True,Color.white)
+player2 = AlphaBetaPlayer(True,Color.black)
 mainGame = Game(player1, player2, 8)
 mainGame.mainLoop()
