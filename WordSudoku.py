@@ -24,6 +24,7 @@ Words = [] #(word,sitch)
 assignments = [] #Array<Assignment>
 Domain = {} #[word]=[(0,0),(0,1)...]list of coords it can go
 Assigned = {}
+numExpandedNodes = 0
 
 def readInput(inputNum):
 	with open('data/bank'+str(inputNum)+'.txt') as input_file:
@@ -106,12 +107,21 @@ def isConsistent():
 		return False
 	return (check3x3(currGrid) and checkRows(currGrid) and checkCols(currGrid))
 
-def printSolution():
+def printSolution(totalTime):
 	solutionGrid = buildGridFromAssignment()
 	for row in range(9):
 		for col in range(9):
 			print solutionGrid[row][col],
 		print ''
+
+	for a in assignments:
+		if  a.sitchType==sitch.across:
+			print 'H,',a.row,',',a.col,': ',a.word
+		else:
+			print 'V,',a.row,',',a.col,': ',a.word
+
+	print "Number of Nodes expanded: ",numExpandedNodes
+	print("Time: %s seconds" % totalTime)
 
 #returns the next word variable that will be assigned a coordinate
 def chooseNextVariable():
@@ -132,6 +142,7 @@ def populateDomain():
 					Domain[word].append((row,col))
 
 def BackTrace():
+	global numExpandedNodes
 	if chooseNextVariable()==True:
 		return True
 	word = chooseNextVariable()
@@ -139,6 +150,7 @@ def BackTrace():
 		assignment = Assignment(coord[0],coord[1],word,sitch.across)
 		assignments.append(assignment)
 		if isConsistent():
+			numExpandedNodes+=1
 			Assigned[word]=True
 			result = BackTrace()
 			if result:
@@ -151,6 +163,7 @@ def BackTrace():
 			assignment = Assignment(coord[0],coord[1],word,sitch.down)
 			assignments.append(assignment)
 			if isConsistent():
+				numExpandedNodes+=1
 				Assigned[word]=True
 				result = BackTrace()
 				if result:
@@ -162,10 +175,13 @@ def BackTrace():
 				assignments.remove(assignment)
 	return False
 
-start_time = time.time()
-readInput(2)
-Words.sort(lambda x,y: cmp(len(y),len(x)))
-populateDomain()
-BackTrace()
-printSolution()
-print("Time: %s seconds" % (time.time() - start_time))
+def main(fileNum):
+	start_time = time.time()
+	readInput(fileNum)
+	Words.sort(lambda x,y: cmp(len(y),len(x)))
+	populateDomain()
+	BackTrace()
+	totalTime = time.time() - start_time
+	printSolution(totalTime)
+
+main(2)
