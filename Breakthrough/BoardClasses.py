@@ -65,10 +65,10 @@ class Board:
         for col in range(0, self.dimension):
             checkPieceTop = self.getPiece(self.dimension - 1, col)
             if checkPieceTop is not None and checkPieceTop.color == Color.white:
-                return True
+                return (True, Color.white)
             checkPieceBottom = self.getPiece(0, col)
             if checkPieceBottom is not None and checkPieceBottom.color == Color.black:
-                return True
+                return (True, Color.black)
         #Check that each side has pieces left on the board
         blackPiecesLeft = False
         whitePiecesLeft = False
@@ -80,8 +80,11 @@ class Board:
                         whitePiecesLeft = True
                     else:
                         blackPiecesLeft = True
-        if not blackPiecesLeft or not whitePiecesLeft:
-            return True
+        if not blackPiecesLeft:
+            return (True, Color.white)
+        if not whitePiecesLeft:
+            return (True, Color.black)
+        return (False, None)
 
     def makeMovement(self, playerMoving, movement):
         if self.isValidMove(playerMoving, movement):

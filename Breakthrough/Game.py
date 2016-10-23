@@ -61,7 +61,7 @@ class Game:
         player2Time = 0
         move1Count = 0
         move2Count = 0
-        while not self.board.isGameOver():
+        while not self.board.isGameOver()[0]:
             start_time = time.time()
             activePlayer.makeMove(self.board, inactivePlayer)
             moveTime = time.time() - start_time

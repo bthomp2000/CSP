@@ -16,9 +16,15 @@ class Player(object):
 
     def offensiveEvaluate(self, board, otherPlayer):
         playerPieces = board.findPlayerPieces()
+        result = board.isGameOver()
+        if result[0]:
+            if result[1] == self.color:
+                return 9999
+            else:
+                return -9999
         total = 0
         #total += 1 * len(self.playerPieces)
-        total -= 1 * len(playerPieces[otherPlayer.color])
+        total -= 3 * len(playerPieces[otherPlayer.color])
         for pieceLocation in playerPieces[self.color]:
             if self.color == Color.white:
                 total += 1 * pieceLocation[0]
@@ -28,8 +34,14 @@ class Player(object):
 
     def defensiveEvaluate(self, board, otherPlayer):
         playerPieces = board.findPlayerPieces()
+        result = board.isGameOver()
+        if result[0]:
+            if result[1] == self.color:
+                return 9999
+            else:
+                return -9999
         total = 0
-        total += 1 * len(playerPieces[self.color])
+        total += 3 * len(playerPieces[self.color])
         #total -= 1 * len(otherPlayer.playerPieces)
         for pieceLocation in playerPieces[otherPlayer.color]:
             if otherPlayer.color == Color.white:
@@ -66,7 +78,7 @@ class MinimaxPlayer(Player):
         board.makeMovement(self, bestMove)
 
     def minimax(self, board, depth, isThisPlayerMoving, otherPlayer):
-        if board.isGameOver() or depth == 0:
+        if board.isGameOver()[0] or depth == 0:
             # print depth
             if self.isOffensive:
                 return (self.offensiveEvaluate(board, otherPlayer), None)
@@ -157,7 +169,7 @@ class AlphaBetaPlayer(Player):
         board.makeMovement(self, bestMove)
 
     def minimax(self, board, depth, minVal, maxVal, isThisPlayerMoving, otherPlayer):
-        if board.isGameOver() or depth == 0:
+        if board.isGameOver()[0] or depth == 0:
             # print depth
             if self.isOffensive:
                 return (self.offensiveEvaluate(board, otherPlayer), None)
