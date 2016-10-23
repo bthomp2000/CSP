@@ -49,7 +49,7 @@ class Board:
         return not isOffBoard
 
     def printBoard(self):
-        for row in range(0, self.dimension):
+        for row in reversed(range(0, self.dimension)):
             for col in range(0, self.dimension):
                 if self.getPiece(row,col) == None:
                     print ' ',
@@ -58,7 +58,7 @@ class Board:
                 else:
                     print 'B',
             print ''
-        print ''
+        print '------------------'
 
     def isGameOver(self):
         #Has either side has reached the opposing side's last row
