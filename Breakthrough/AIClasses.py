@@ -8,10 +8,9 @@ class Player(object):
     opponentWorkersCaptured = 0
     totalTimeTaken = 0
     numberOfMoves = 0
-    playerPieces = []
 
     @abc.abstractmethod
-    def makeMove(self, board):
+    def makeMove(self, board, otherPlayer):
         """Analyzes the board state and returns a Movement for this player"""
         return
 
@@ -38,19 +37,26 @@ class MinimaxPlayer(Player):
         super.__init__()
         self.isOffensive = isOffensive
 
+    def makeMove(self, board, otherPlayer):
+        bestMove = self.minimax(board, 3, True, otherPlayer)[1]
+        board.makeMovement(self, bestMove)
+
     def minimax(self, board, depth, isThisPlayerMoving, otherPlayer):
         if board.isGameOver() is True or depth == 0:
             if self.isOffensive:
-                self.offensiveEvaluate(board, otherPlayer)
+                return (self.offensiveEvaluate(board, otherPlayer), None)
             else:
-                self.defensiveEvaluate(board, otherPlayer)
+                return (self.defensiveEvaluate(board, otherPlayer), None)
         currentPlayer = None
+        v = -999999
+        bestMove = None
         if isThisPlayerMoving:
             currentPlayer = self
         else:
             currentPlayer = otherPlayer
-        v = -999999
-        for pieceLocation in currentPlayer.playerPieces:
+            v = 999999
+        playerPieces = board.findPlayerPieces()
+        for pieceLocation in playerPieces[currentPlayer.color]:
             upValue = 0
             if currentPlayer.color == Color.white:
                 upValue = 1
@@ -61,45 +67,53 @@ class MinimaxPlayer(Player):
             rightForward = Movement(pieceLocation, (pieceLocation[0] + upValue, pieceLocation[1] + 1))
             if board.isValidMove(currentPlayer, leftForward):
                 oldDestinationPiece = board.makeMovement(currentPlayer, leftForward)
-                vPrime = self.minimax(board, depth-1, not isThisPlayerMoving, otherPlayer)
+                vPrime = self.minimax(board, depth-1, not isThisPlayerMoving, otherPlayer)[0]
                 if isThisPlayerMoving and vPrime > v:
                     v = vPrime
+                    bestMove = leftForward
                 elif not isThisPlayerMoving and vPrime < v:
                     v = vPrime
+                    bestMove = leftForward
                 board.undoMovement(currentPlayer, leftForward, oldDestinationPiece)
             if board.isValidMove(currentPlayer, forward):
                 oldDestinationPiece = board.makeMovement(currentPlayer, forward)
-                vPrime = self.minimax(board, depth-1, not isThisPlayerMoving, otherPlayer)
+                vPrime = self.minimax(board, depth-1, not isThisPlayerMoving, otherPlayer)[0]
                 if isThisPlayerMoving and vPrime > v:
                     v = vPrime
+                    bestMove = forward
                 elif not isThisPlayerMoving and vPrime < v:
                     v = vPrime
+                    bestMove = forward
                 board.undoMovement(currentPlayer, forward, oldDestinationPiece)
             if board.isValidMove(currentPlayer, rightForward):
                 oldDestinationPiece = board.makeMovement(currentPlayer, rightForward)
-                vPrime = self.minimax(board, depth-1, not isThisPlayerMoving, otherPlayer)
+                vPrime = self.minimax(board, depth-1, not isThisPlayerMoving, otherPlayer)[0]
                 if isThisPlayerMoving and vPrime > v:
                     v = vPrime
+                    bestMove = rightForward
                 elif not isThisPlayerMoving and vPrime < v:
                     v = vPrime
+                    bestMove = rightForward
                 board.undoMovement(currentPlayer, rightForward, oldDestinationPiece)
-        return v
+        return (v, bestMove)
 
     def offensiveEvaluate(self, board, otherPlayer):
+        playerPieces = board.findPlayerPieces()
         total = 0
         #total += 1 * len(self.playerPieces)
-        total -= 1 * len(otherPlayer.playerPieces)
-        for pieceLocation in self.playerPieces:
+        total -= 1 * len(playerPieces[otherPlayer.color])
+        for pieceLocation in playerPieces[self.color]:
             if self.color == Color.white:
                 total += 1 * pieceLocation[0]
             else:
                 total += 1 * (board.dimension - (pieceLocation[0]+1))
 
     def defensiveEvaluate(self, board, otherPlayer):
+        playerPieces = board.findPlayerPieces()
         total = 0
-        total += 1 * len(self.playerPieces)
+        total += 1 * len(playerPieces[self.color])
         #total -= 1 * len(otherPlayer.playerPieces)
-        for pieceLocation in otherPlayer.playerPieces:
+        for pieceLocation in playerPieces[otherPlayer.color]:
             if otherPlayer.color == Color.white:
                 total -= 1 * pieceLocation[0]
             else:

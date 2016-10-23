@@ -24,6 +24,7 @@ class Square:
 class Board:
     grid = [] #A grid of Squares with arrangement [row][col]. Bottom-left is [0][0]
     dimension = 0 #The dimension of the game board. For example, 8 means an 8x8 board
+    playerPieces = {}
 
     def __init__(self, dimension=8):
         assert dimension >= 4
@@ -71,19 +72,26 @@ class Board:
             return True
 
     def makeMovement(self, playerMoving, movement):
-        #defendingPiece = self.getPiece(movement.destination[0], movement.destination[1])
-        #if defendingPiece is not None:
-            #playerMoving.opponentWorkersCaptured += 1
+        defendingPiece = self.getPiece(movement.destination[0], movement.destination[1])
         movingPiece = self.getPiece(movement.origin[0], movement.origin[1])
-        destinationPiece = self.getPiece(movement.destination[0], movement.destination[1])
         self.setPiece(movement.destination[0], movement.destination[1], movingPiece)
         self.setPiece(movement.origin[0], movement.origin[1], None)
-        return destinationPiece
+        return defendingPiece
 
     def undoMovement(self, playerMoving, movement, destinationPiece):
         movingPiece = self.getPiece(movement.destination[0], movement.destination[1])
         self.setPiece(movement.origin[0], movement.origin[1], movingPiece)
         self.setPiece(movement.destination[0], movement.destination[1], destinationPiece)
+
+    def findPlayerPieces(self):
+        playerPieces = {}
+        playerPieces[Color.white] = []
+        playerPieces[Color.black] = []
+        for row in range(0, self.dimension):
+            for col in range(0, self.dimension):
+                currPiece = self.getPiece(row, col)
+                if currPiece is not None:
+                    playerPieces[currPiece.color].append((row, col))
 
     def isValidMove(self, playerMoving, movement):
         playerColor = playerMoving.color

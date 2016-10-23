@@ -2,8 +2,8 @@ from Breakthrough.BoardClasses import Board, Color, Movement, Piece
 from Breakthrough.AIClasses import Player
 
 class Game:
-    player1 = None
-    player2 = None
+    player1 = None #White
+    player2 = None #Black
     board = None
     turnNumber = 0
 
@@ -17,13 +17,17 @@ class Game:
     def setUpInitialBoardState(self):
         boardDimension = self.board.dimension
         #Set up top of board
+        self.board.playerPieces[Color.white] = []
+        self.board.playerPieces[Color.black] = []
         for row in range(0, 2):
             for col in range(0, boardDimension):
                 self.board.setPiece(row, col, Piece(Color.black))
+                self.board.playerPieces[Color.black].append((row, col))
         #Set up bottom of board
         for row in range(boardDimension - 2, boardDimension):
             for col in range(0, boardDimension):
                 self.board.setPiece(row, col, Piece(Color.white))
+                self.board.playerPieces[Color.white].append((row, col))
 
     def isValidMove(self, playerMoving, movement):
         playerColor = playerMoving.color
