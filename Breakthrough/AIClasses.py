@@ -14,6 +14,30 @@ class Player(object):
         """Analyzes the board state and returns a Movement for this player"""
         return
 
+    def offensiveEvaluate(self, board, otherPlayer):
+        playerPieces = board.findPlayerPieces()
+        total = 0
+        #total += 1 * len(self.playerPieces)
+        total -= 1 * len(playerPieces[otherPlayer.color])
+        for pieceLocation in playerPieces[self.color]:
+            if self.color == Color.white:
+                total += 1 * pieceLocation[0]
+            else:
+                total += 1 * (board.dimension - (pieceLocation[0]+1))
+        return total
+
+    def defensiveEvaluate(self, board, otherPlayer):
+        playerPieces = board.findPlayerPieces()
+        total = 0
+        total += 1 * len(playerPieces[self.color])
+        #total -= 1 * len(otherPlayer.playerPieces)
+        for pieceLocation in playerPieces[otherPlayer.color]:
+            if otherPlayer.color == Color.white:
+                total -= 1 * pieceLocation[0]
+            else:
+                total -= 1 * (board.dimension - (pieceLocation[0]+1))
+        return total
+
 # (* the minimax value of n, searched to depth d *)
 #  fun minimax(n: node, d: int): int =
 #    if leaf(n) or depth=0 return evaluate(n)
@@ -100,29 +124,6 @@ class MinimaxPlayer(Player):
         #print "value: ",v
         return (v, bestMove)
 
-    def offensiveEvaluate(self, board, otherPlayer):
-        playerPieces = board.findPlayerPieces()
-        total = 0
-        #total += 1 * len(self.playerPieces)
-        total -= 1 * len(playerPieces[otherPlayer.color])
-        for pieceLocation in playerPieces[self.color]:
-            if self.color == Color.white:
-                total += 1 * pieceLocation[0]
-            else:
-                total += 1 * (board.dimension - (pieceLocation[0]+1))
-        return total
-
-    def defensiveEvaluate(self, board, otherPlayer):
-        playerPieces = board.findPlayerPieces()
-        total = 0
-        total += 1 * len(playerPieces[self.color])
-        #total -= 1 * len(otherPlayer.playerPieces)
-        for pieceLocation in playerPieces[otherPlayer.color]:
-            if otherPlayer.color == Color.white:
-                total -= 1 * pieceLocation[0]
-            else:
-                total -= 1 * (board.dimension - (pieceLocation[0]+1))
-        return total
 
 # (* the minimax value of n, searched to depth d.
 #  * If the value is less than min, returns min.
@@ -242,26 +243,3 @@ class AlphaBetaPlayer(Player):
                 board.undoMovement(currentPlayer, rightForward, oldDestinationPiece)
         return (v, bestMove)
 
-    def offensiveEvaluate(self, board, otherPlayer):
-        playerPieces = board.findPlayerPieces()
-        total = 0
-        #total += 1 * len(self.playerPieces)
-        total -= 1 * len(playerPieces[otherPlayer.color])
-        for pieceLocation in playerPieces[self.color]:
-            if self.color == Color.white:
-                total += 1 * pieceLocation[0]
-            else:
-                total += 1 * (board.dimension - (pieceLocation[0]+1))
-        return total
-
-    def defensiveEvaluate(self, board, otherPlayer):
-        playerPieces = board.findPlayerPieces()
-        total = 0
-        total += 1 * len(playerPieces[self.color])
-        #total -= 1 * len(otherPlayer.playerPieces)
-        for pieceLocation in playerPieces[otherPlayer.color]:
-            if otherPlayer.color == Color.white:
-                total -= 1 * pieceLocation[0]
-            else:
-                total -= 1 * (board.dimension - (pieceLocation[0]+1))
-        return total

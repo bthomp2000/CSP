@@ -1,5 +1,6 @@
 from BoardClasses import Board, Color, Movement, Piece
 from AIClasses import Player, MinimaxPlayer, AlphaBetaPlayer
+import time
 
 class Game:
     player1 = None #White
@@ -56,17 +57,32 @@ class Game:
     def mainLoop(self):
         activePlayer = self.player1
         inactivePlayer = self.player2
+        player1Time = 0
+        player2Time = 0
+        move1Count = 0
+        move2Count = 0
         while not self.board.isGameOver():
+            start_time = time.time()
             activePlayer.makeMove(self.board, inactivePlayer)
+            moveTime = time.time() - start_time
             self.board.printBoard()
             if activePlayer == self.player1:
+                player1Time+=moveTime
+                move1Count +=1
                 activePlayer = self.player2
                 inactivePlayer = self.player1
             else:
+                player2Time+=moveTime
+                move2Count +=1
                 activePlayer = self.player1
                 inactivePlayer = self.player2
+        player1Average = player1Time / move1Count
+        player2Average = player2Time / move2Count
+
+        print "Player 1 average: ",player1Average
+        print "Player 2 average: ",player2Average
 
 player1 = MinimaxPlayer(True,Color.white)
-player2 = MinimaxPlayer(True,Color.black)
+player2 = AlphaBetaPlayer(True,Color.black)
 mainGame = Game(player1, player2, 8)
 mainGame.mainLoop()
