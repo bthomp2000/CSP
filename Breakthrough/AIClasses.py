@@ -30,7 +30,7 @@ class Player(object):
             if self.color == Color.white:
                 total += 2 * pieceLocation[0]
             else:
-                total += 2 * (board.dimension - (pieceLocation[0]+1))
+                total += 2 * (board.rows - (pieceLocation[0]+1))
         return total
 
     def defensiveEvaluate(self, board, otherPlayer):
@@ -48,7 +48,7 @@ class Player(object):
             if otherPlayer.color == Color.white:
                 total -= 2 * pieceLocation[0]
             else:
-                total -= 2 * (board.dimension - (pieceLocation[0]+1))
+                total -= 2 * (board.rows - (pieceLocation[0]+1))
         return total
 
 # (* the minimax value of n, searched to depth d *)
@@ -162,6 +162,68 @@ class MinimaxPlayer(Player):
 #          if v' < v, v:= v'
 #          if v < min return min
 #       return v
+
+class GreedyPlayer(Player):
+    isOffensive = True
+
+    def __init__(self, isOffensive, color):
+        self.isOffensive = isOffensive
+        self.color = color
+
+    def makeMove(self, board, otherPlayer):
+        bestMove = self.greedySearch(board, otherPlayer, 1)[1]
+        board.makeMovement(self, bestMove)
+
+    def greedySearch(self, board, otherPlayer, depth):
+        if board.isGameOver()[0] or depth == 0:
+            # print depth
+            if self.isOffensive:
+                return (self.offensiveEvaluate(board, otherPlayer), None)
+            else:
+                return (self.defensiveEvaluate(board, otherPlayer), None)
+        currentPlayer = self
+        v = -99999
+        bestMove = None
+        playerPieces = board.findPlayerPieces()
+        for pieceLocation in playerPieces[currentPlayer.color]:
+            upValue = 0
+            if currentPlayer.color == Color.white:
+                upValue = 1
+            else:
+                upValue = -1
+            leftForward = Movement(pieceLocation, (pieceLocation[0] + upValue, pieceLocation[1] - 1))
+            forward = Movement(pieceLocation, (pieceLocation[0] + upValue, pieceLocation[1]))
+            rightForward = Movement(pieceLocation, (pieceLocation[0] + upValue, pieceLocation[1] + 1))
+            if board.isValidMove(currentPlayer, leftForward):
+                oldDestinationPiece = board.makeMovement(currentPlayer, leftForward)
+                vPrime = 0
+                self.gameTreeNodesExpanded+=1
+                vPrime = self.greedySearch(board, otherPlayer, depth-1)[0]
+                if vPrime > v:
+                    v = vPrime
+                    bestMove = leftForward
+                board.undoMovement(currentPlayer, leftForward, oldDestinationPiece)
+            if board.isValidMove(currentPlayer, forward):
+                oldDestinationPiece = board.makeMovement(currentPlayer, forward)
+                vPrime = 0
+                self.gameTreeNodesExpanded+=1
+                vPrime = self.greedySearch(board, otherPlayer, depth-1)[0]
+                if vPrime > v:
+                    v = vPrime
+                    bestMove = forward
+                board.undoMovement(currentPlayer, forward, oldDestinationPiece)
+            if board.isValidMove(currentPlayer, rightForward):
+                oldDestinationPiece = board.makeMovement(currentPlayer, rightForward)
+                vPrime = 0
+                self.gameTreeNodesExpanded+=1
+                vPrime = self.greedySearch(board, otherPlayer, depth-1)[0]
+                if vPrime > v:
+                    v = vPrime
+                    bestMove = rightForward
+                board.undoMovement(currentPlayer, rightForward, oldDestinationPiece)
+        return (v, bestMove)
+
+
 
 class AlphaBetaPlayer(Player):
     isOffensive = True

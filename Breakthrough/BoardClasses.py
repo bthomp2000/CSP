@@ -24,18 +24,22 @@ class Square:
 class Board:
     grid = [] #A grid of Squares with arrangement [row][col]. Bottom-left is [0][0]
     dimension = 0 #The dimension of the game board. For example, 8 means an 8x8 board
+    rows = 0
+    cols = 0
     playerPieces = {}
 
-    def __init__(self, dimension=8):
-        assert dimension >= 4
-        self.dimension = dimension
-        self.initializeGrid(dimension)
+    def __init__(self, rows=8, cols=8):
+        assert rows >= 4
+        self.dimension = rows
+        self.rows = rows
+        self.cols = cols
+        self.initializeGrid(rows, cols)
 
-    def initializeGrid(self, dimension):
+    def initializeGrid(self, rows, cols):
         self.grid=[]
-        for i in range(0,dimension):
+        for i in range(0,rows):
             self.grid.append([])
-            for j in range(0,dimension):
+            for j in range(0,cols):
                 self.grid[i].append(Square(None))
 
     def setPiece(self, row, col, piece):
@@ -45,12 +49,12 @@ class Board:
         return self.grid[row][col].piece
 
     def isPointOnBoard(self, row, col):
-        isOffBoard = row < 0 or col < 0 or row >= self.dimension or col >= self.dimension
+        isOffBoard = row < 0 or col < 0 or row >= self.rows or col >= self.cols
         return not isOffBoard
 
     def printBoard(self):
-        for row in reversed(range(0, self.dimension)):
-            for col in range(0, self.dimension):
+        for row in reversed(range(0, self.rows)):
+            for col in range(0, self.cols):
                 if self.getPiece(row,col) == None:
                     print ' ',
                 elif self.getPiece(row,col).color == Color.white:
@@ -62,8 +66,8 @@ class Board:
 
     def isGameOver(self):
         #Has either side has reached the opposing side's last row
-        for col in range(0, self.dimension):
-            checkPieceTop = self.getPiece(self.dimension - 1, col)
+        for col in range(0, self.cols):
+            checkPieceTop = self.getPiece(self.rows - 1, col)
             if checkPieceTop is not None and checkPieceTop.color == Color.white:
                 return (True, Color.white)
             checkPieceBottom = self.getPiece(0, col)
@@ -104,13 +108,13 @@ class Board:
         playerPieces = {}
         playerPieces[Color.white] = []
         playerPieces[Color.black] = []
-        for row in range(0, self.dimension):
-            for col in range(0, self.dimension):
+        for row in range(0, self.rows):
+            for col in range(0, self.cols):
                 currPiece = self.getPiece(row, col)
                 if currPiece is not None and currPiece.color == Color.black:
                     playerPieces[Color.black].append((row, col))
-        for row in reversed(range(0, self.dimension)):
-            for col in range(0, self.dimension):
+        for row in reversed(range(0, self.rows)):
+            for col in range(0, self.cols):
                 currPiece = self.getPiece(row, col)
                 if currPiece is not None and currPiece.color == Color.white:
                     playerPieces[Color.white].append((row, col))

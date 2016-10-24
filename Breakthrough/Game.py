@@ -1,5 +1,5 @@
 from BoardClasses import Board, Color, Movement, Piece
-from AIClasses import Player, MinimaxPlayer, AlphaBetaPlayer
+from AIClasses import Player, MinimaxPlayer, AlphaBetaPlayer, GreedyPlayer
 import time
 
 class Game:
@@ -8,25 +8,27 @@ class Game:
     board = None
     turnNumber = 0
 
-    def __init__(self, player1, player2, boardDimension):
+    def __init__(self, player1, player2, boardRows, boardCols):
         self.player1 = player1
         self.player2 = player2
-        self.board = Board(boardDimension)
+        self.board = Board(boardRows, boardCols)
         self.turnNumber = 0
         self.setUpInitialBoardState()
 
     def setUpInitialBoardState(self):
-        boardDimension = self.board.dimension
+        #boardDimension = self.board.dimension
+        boardRows = self.board.rows
+        boardCols = self.board.cols
         #Set up top of board
         self.board.playerPieces[Color.white] = []
         self.board.playerPieces[Color.black] = []
         for row in range(0, 2):
-            for col in range(0, boardDimension):
+            for col in range(0, boardCols):
                 self.board.setPiece(row, col, Piece(Color.white))
                 self.board.playerPieces[Color.white].append((row, col))
         #Set up bottom of board
-        for row in range(boardDimension - 2, boardDimension):
-            for col in range(0, boardDimension):
+        for row in range(boardRows - 2, boardRows):
+            for col in range(0, boardCols):
                 self.board.setPiece(row, col, Piece(Color.black))
                 self.board.playerPieces[Color.black].append((row, col))
 
@@ -91,7 +93,7 @@ class Game:
         print "Number of pieces captured by Player 2: ",16-len(self.board.playerPieces[player1.color])
         print "Number of total moves made by Player 2: ",move2Count
 
-player1 = MinimaxPlayer(True,Color.white)
-player2 = AlphaBetaPlayer(True,Color.black)
-mainGame = Game(player1, player2, 8)
+player1 = GreedyPlayer(True,Color.white)
+player2 = AlphaBetaPlayer(False,Color.black)
+mainGame = Game(player1, player2, 8, 8)
 mainGame.mainLoop()
