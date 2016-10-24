@@ -8,6 +8,7 @@ class Player(object):
     opponentWorkersCaptured = 0
     totalTimeTaken = 0
     numberOfMoves = 0
+    gameTreeNodesExpanded=0;
 
     @abc.abstractmethod
     def makeMove(self, board, otherPlayer):
@@ -24,12 +25,12 @@ class Player(object):
                 return -9999
         total = 0
         #total += 1 * len(self.playerPieces)
-        total -= 3 * len(playerPieces[otherPlayer.color])
+        total -= 10 * len(playerPieces[otherPlayer.color])
         for pieceLocation in playerPieces[self.color]:
             if self.color == Color.white:
-                total += 1 * pieceLocation[0]
+                total += 2 * pieceLocation[0]
             else:
-                total += 1 * (board.dimension - (pieceLocation[0]+1))
+                total += 2 * (board.dimension - (pieceLocation[0]+1))
         return total
 
     def defensiveEvaluate(self, board, otherPlayer):
@@ -41,13 +42,13 @@ class Player(object):
             else:
                 return -9999
         total = 0
-        total += 3 * len(playerPieces[self.color])
+        total += 10 * len(playerPieces[self.color])
         #total -= 1 * len(otherPlayer.playerPieces)
         for pieceLocation in playerPieces[otherPlayer.color]:
             if otherPlayer.color == Color.white:
-                total -= 1 * pieceLocation[0]
+                total -= 2 * pieceLocation[0]
             else:
-                total -= 1 * (board.dimension - (pieceLocation[0]+1))
+                total -= 2 * (board.dimension - (pieceLocation[0]+1))
         return total
 
 # (* the minimax value of n, searched to depth d *)
@@ -74,6 +75,8 @@ class MinimaxPlayer(Player):
         self.color = color
 
     def makeMove(self, board, otherPlayer):
+        print "game tree nodes expanded so far: ",self.gameTreeNodesExpanded
+
         bestMove = self.minimax(board, 3, True, otherPlayer)[1]
         board.makeMovement(self, bestMove)
 
@@ -104,6 +107,7 @@ class MinimaxPlayer(Player):
             rightForward = Movement(pieceLocation, (pieceLocation[0] + upValue, pieceLocation[1] + 1))
             if board.isValidMove(currentPlayer, leftForward):
                 oldDestinationPiece = board.makeMovement(currentPlayer, leftForward)
+                self.gameTreeNodesExpanded+=1
                 vPrime = self.minimax(board, depth-1, not isThisPlayerMoving, otherPlayer)[0]
                 # print vPrime
                 if isThisPlayerMoving and vPrime > v:
@@ -115,6 +119,7 @@ class MinimaxPlayer(Player):
                 board.undoMovement(currentPlayer, leftForward, oldDestinationPiece)
             if board.isValidMove(currentPlayer, forward):
                 oldDestinationPiece = board.makeMovement(currentPlayer, forward)
+                self.gameTreeNodesExpanded+=1
                 vPrime = self.minimax(board, depth-1, not isThisPlayerMoving, otherPlayer)[0]
                 if isThisPlayerMoving and vPrime > v:
                     v = vPrime
@@ -125,6 +130,7 @@ class MinimaxPlayer(Player):
                 board.undoMovement(currentPlayer, forward, oldDestinationPiece)
             if board.isValidMove(currentPlayer, rightForward):
                 oldDestinationPiece = board.makeMovement(currentPlayer, rightForward)
+                self.gameTreeNodesExpanded+=1
                 vPrime = self.minimax(board, depth-1, not isThisPlayerMoving, otherPlayer)[0]
                 if isThisPlayerMoving and vPrime > v:
                     v = vPrime
@@ -164,7 +170,9 @@ class AlphaBetaPlayer(Player):
         self.isOffensive = isOffensive
         self.color = color
 
+
     def makeMove(self, board, otherPlayer):
+        # print "game tree nodes expanded so far: ",self.gameTreeNodesExpanded
         bestMove = self.minimax(board, 3, -999999,999999,True, otherPlayer)[1]
         board.makeMovement(self, bestMove)
 
@@ -197,6 +205,7 @@ class AlphaBetaPlayer(Player):
                 oldDestinationPiece = board.makeMovement(currentPlayer, leftForward)
                 vPrime = 0
                 if isThisPlayerMoving: #we are a max node
+                    self.gameTreeNodesExpanded+=1
                     vPrime = self.minimax(board, depth-1, v,maxVal,not isThisPlayerMoving, otherPlayer)[0]
                     if vPrime > v:
                         v = vPrime
@@ -205,6 +214,7 @@ class AlphaBetaPlayer(Player):
                         board.undoMovement(currentPlayer, leftForward, oldDestinationPiece)
                         return (maxVal,bestMove)
                 else: #we are a min node
+                    self.gameTreeNodesExpanded+=1
                     vPrime = self.minimax(board, depth-1, minVal,v,not isThisPlayerMoving, otherPlayer)[0]
                     if vPrime < v:
                         v = vPrime
@@ -217,6 +227,7 @@ class AlphaBetaPlayer(Player):
                 oldDestinationPiece = board.makeMovement(currentPlayer, forward)
                 vPrime = 0
                 if isThisPlayerMoving:
+                    self.gameTreeNodesExpanded+=1
                     vPrime = self.minimax(board, depth-1, v,maxVal,not isThisPlayerMoving, otherPlayer)[0]
                     if vPrime > v:
                         v = vPrime
@@ -225,6 +236,7 @@ class AlphaBetaPlayer(Player):
                         board.undoMovement(currentPlayer, forward, oldDestinationPiece)
                         return (maxVal,bestMove)
                 else:
+                    self.gameTreeNodesExpanded+=1
                     vPrime = self.minimax(board, depth-1, minVal,v,not isThisPlayerMoving, otherPlayer)[0]
                     if vPrime < v:
                         v = vPrime
@@ -237,6 +249,7 @@ class AlphaBetaPlayer(Player):
                 oldDestinationPiece = board.makeMovement(currentPlayer, rightForward)
                 vPrime = 0
                 if isThisPlayerMoving:
+                    self.gameTreeNodesExpanded+=1
                     vPrime = self.minimax(board, depth-1, v,maxVal,not isThisPlayerMoving, otherPlayer)[0]
                     if vPrime > v:
                         v = vPrime
@@ -245,6 +258,7 @@ class AlphaBetaPlayer(Player):
                         board.undoMovement(currentPlayer, rightForward, oldDestinationPiece)
                         return (maxVal,bestMove)
                 else:
+                    self.gameTreeNodesExpanded+=1
                     vPrime = self.minimax(board, depth-1, minVal,v,not isThisPlayerMoving, otherPlayer)[0]
                     if vPrime < v:
                         v = vPrime

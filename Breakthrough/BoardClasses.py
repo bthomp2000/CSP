@@ -72,18 +72,18 @@ class Board:
         #Check that each side has pieces left on the board
         blackPiecesLeft = False
         whitePiecesLeft = False
-        for row in range(0, self.dimension):
-            for col in range(0, self.dimension):
-                checkPiece = self.getPiece(row, col)
-                if checkPiece is not None:
-                    if checkPiece.color == Color.white:
-                        whitePiecesLeft = True
-                    else:
-                        blackPiecesLeft = True
-        if not blackPiecesLeft:
-            return (True, Color.white)
-        if not whitePiecesLeft:
-            return (True, Color.black)
+        # for row in range(0, self.dimension):
+        #     for col in range(0, self.dimension):
+        #         checkPiece = self.getPiece(row, col)
+        #         if checkPiece is not None:
+        #             if checkPiece.color == Color.white:
+        #                 whitePiecesLeft = True
+        #             else:
+        #                 blackPiecesLeft = True
+        # if not blackPiecesLeft:
+        #     return (True, Color.white)
+        # if not whitePiecesLeft:
+        #     return (True, Color.black)
         return (False, None)
 
     def makeMovement(self, playerMoving, movement):
@@ -99,6 +99,7 @@ class Board:
         self.setPiece(movement.origin[0], movement.origin[1], movingPiece)
         self.setPiece(movement.destination[0], movement.destination[1], destinationPiece)
 
+    
     def findPlayerPieces(self):
         playerPieces = {}
         playerPieces[Color.white] = []
@@ -106,8 +107,14 @@ class Board:
         for row in range(0, self.dimension):
             for col in range(0, self.dimension):
                 currPiece = self.getPiece(row, col)
-                if currPiece is not None:
-                    playerPieces[currPiece.color].append((row, col))
+                if currPiece is not None and currPiece.color == Color.black:
+                    playerPieces[Color.black].append((row, col))
+        for row in reversed(range(0, self.dimension)):
+            for col in range(0, self.dimension):
+                currPiece = self.getPiece(row, col)
+                if currPiece is not None and currPiece.color == Color.white:
+                    playerPieces[Color.white].append((row, col))
+        # print playerPieces
         return playerPieces
 
     def isValidMove(self, playerMoving, movement):

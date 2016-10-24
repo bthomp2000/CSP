@@ -80,7 +80,16 @@ class Game:
         player2Average = player2Time / move2Count
 
         print "Player 1 average: ",player1Average
+        print "Player 1 total nodes expanded: ",self.player1.gameTreeNodesExpanded
+        print "Player 1 average nodes expanded: ",self.player1.gameTreeNodesExpanded / move1Count
+        print "Number of pieces captured by Player 1: ",16-len(self.board.playerPieces[player2.color])
+        print "Number of total moves made by Player 1: ",move1Count
+
         print "Player 2 average: ",player2Average
+        print "Player 2 total nodes expanded: ",self.player2.gameTreeNodesExpanded
+        print "Player 2 average nodes expanded: ",self.player2.gameTreeNodesExpanded / move2Count
+        print "Number of pieces captured by Player 2: ",16-len(self.board.playerPieces[player1.color])
+        print "Number of total moves made by Player 2: ",move2Count
 
 player1 = MinimaxPlayer(True,Color.white)
 player2 = AlphaBetaPlayer(True,Color.black)
